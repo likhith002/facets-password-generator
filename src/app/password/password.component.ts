@@ -16,18 +16,40 @@ export class PasswordComponent {
   includeSpecialChars: boolean = false;
   generatedPassword: string = '';
   warning: { type: WarningType; message: string } | null = null;
+  MAX_PASSWORD_LENGTH:number=20
 
   alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   numbers = '0123456789';
   specialChars = '~!@#$%^&*()_+';
   WarningType = WarningType;
   validateLength() {
-    if (this.passwordLength <= 0 || this.passwordLength > 20) {
+    if (
+      !this.passwordLength ||
+      this.passwordLength <= 0 ||
+      this.passwordLength > this.MAX_PASSWORD_LENGTH
+    ) {
       this.warning = {
         type: WarningType.Password,
-        message: 'Password length should be between 1 and 20',
+        message: `Password length should be between 1 and ${this.MAX_PASSWORD_LENGTH}`,
       };
-    } else {
+      this.generatedPassword = '';
+    } else if (this.warning?.type == WarningType.Password) {
+      this.warning = null;
+    }
+  }
+  validateOptions() {
+    if (
+      !this.includeAlphabets &&
+      !this.includeNumbers &&
+      !this.includeSpecialChars
+    ) {
+      this.warning = {
+        type: WarningType.Validation,
+        message:
+          'Please select at least one option for generating the password.',
+      };
+      this.generatedPassword = '';
+    } else if (this.warning?.type == WarningType.Validation) {
       this.warning = null;
     }
   }
@@ -37,20 +59,16 @@ export class PasswordComponent {
     if (this.includeAlphabets) contenderChars += this.alphabets;
     if (this.includeNumbers) contenderChars += this.numbers;
     if (this.includeSpecialChars) contenderChars += this.specialChars;
-
-    if (!contenderChars) {
-      this.warning = {
-        type: WarningType.Validation,
-        message:
-          'Please select at least one option for generating the password.',
-      };
+    this.validateLength()
+    this.validateOptions()
+    if (this.warning) {
       return;
     }
 
     let password = '';
     for (let i = 0; i < this.passwordLength; i++) {
-      const randomIndex = Math.floor(Math.random() * contenderChars.length);
-      password += contenderChars[randomIndex];
+      const index = Math.floor(Math.random() * contenderChars.length);
+      password += contenderChars[index];
     }
 
     this.generatedPassword = password;
