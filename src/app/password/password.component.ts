@@ -25,12 +25,12 @@ export class PasswordComponent {
   validateLength() {
     if (
       !this.passwordLength ||
-      this.passwordLength <= 0 ||
+      this.passwordLength < 8 ||
       this.passwordLength > this.MAX_PASSWORD_LENGTH
     ) {
       this.warning = {
         type: WarningType.Password,
-        message: `Password length should be between 1 and ${this.MAX_PASSWORD_LENGTH}`,
+        message: `Password length should be between 8 and ${this.MAX_PASSWORD_LENGTH}`,
       };
       this.generatedPassword = '';
     } else if (this.warning?.type == WarningType.Password) {
